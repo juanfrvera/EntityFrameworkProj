@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AccountManager.Domain
+{
+    internal class Account
+    {
+        private int id;
+
+        public int Id
+        {
+            get { return id; }
+            set { id = value; }
+        }
+
+        private String name;
+
+        public String Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
+        private double overdraftLimit;
+
+        public double OverdraftLimit
+        {
+            get { return overdraftLimit; }
+            set { overdraftLimit = value; }
+        }
+
+        //Atributos inferidos
+        private Client iClient;
+        private IList<AccountMovement> iMovements;
+
+        //Constructor
+        public Account()
+        {
+            iMovements = new List<AccountMovement>();
+        }
+        //Metodos
+        public double GetBalance()
+        {
+            double balance = 0;
+            foreach (AccountMovement mov in iMovements)
+            {
+                balance += mov.Amount;
+            }
+            return balance;
+        }
+        public IEnumerable<AccountMovement> GetLastMovements(int pCount = 7)
+        {   
+            return iMovements.OrderByDescending(mov => mov.Date).Take<AccountMovement>(pCount);
+        }
+    }
+}

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{92A73395-A2E7-42AD-91AB-F966C25CAA09}</ProjectGuid>
+    <ProjectGuid>{B2DEDE89-8A30-44F6-8F62-8755B29A67FB}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>EntityFrameworkProj</RootNamespace>
-    <AssemblyName>EntityFrameworkProj</AssemblyName>
+    <RootNamespace>AccountManager</RootNamespace>
+    <AssemblyName>AccountManager</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -49,11 +49,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgendaContext.cs" />
-    <Compile Include="Persona.cs" />
+    <Compile Include="Bank.cs" />
+    <Compile Include="DAL\EntityFramework\AccountManagerDbContext.cs" />
+    <Compile Include="DAL\EntityFramework\AccountRepository.cs" />
+    <Compile Include="DAL\EntityFramework\ClientRepository.cs" />
+    <Compile Include="DAL\EntityFramework\Repository.cs" />
+    <Compile Include="DAL\EntityFramework\UnitOfWork.cs" />
+    <Compile Include="DAL\IAccountRepository.cs" />
+    <Compile Include="DAL\IClientRepository.cs" />
+    <Compile Include="DAL\IRepository.cs" />
+    <Compile Include="DAL\IUnitOfWork.cs" />
+    <Compile Include="Domain\Account.cs" />
+    <Compile Include="Domain\AccountMovement.cs" />
+    <Compile Include="Domain\Client.cs" />
+    <Compile Include="Domain\Document.cs" />
+    <Compile Include="IO\AccountDTO.cs" />
+    <Compile Include="IO\AccountMovementDTO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Telefono.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
