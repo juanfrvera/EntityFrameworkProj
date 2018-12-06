@@ -34,11 +34,22 @@ namespace AccountManager.Domain
 
         //Atributos inferidos
         private Client iClient;
+
+        public Client Client
+        {
+            get { return client; }
+            set { client = value; } 
+        }
+
         private IList<AccountMovement> iMovements;
 
-        //Constructor
-        public Account()
+        //Constructor  {Lo modifique, miralo y despues borra esto. Le puse id, nombre, overd y client}
+        public Account(int pId, string pName, double pOverdraftLimit, Client pClient)
         {
+            id = pId;
+            name = pName;
+            overdraftLimit = pOverdraftLimit;
+            client = pClient;  //Aca añadi una propiedad Cliente porque en el diagrama aparecia +Client.
             iMovements = new List<AccountMovement>();
         }
         //Metodos
