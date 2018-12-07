@@ -5,10 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AccountManager.IO;
 using AccountManager.Domain;   //Este lo agregue yo recien
+using AccountManager.DAL;//Para los repositorios
 namespace AccountManager
 {
     internal class Bank
     {
+        private IClientRepository clientRepository;
+        private IAccountRepository accountRepository;
+
         public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
         {
             throw new NotImplementedException();
@@ -20,23 +24,47 @@ namespace AccountManager
 
         public void CreateAccount(int pClientId,string pAccountName, double pAccountOverdraftLimit)
         { 
-            //¿Como consigo los repositorios? Por ahora supongamos que uso estos comentarios como guia.
+            try 
+            {	        
+                Client client = clientRepository.Get(pClientId);
 
-            // Client client = ClientRepository.get(pClientId);
-            Client client = new Client(); //Esto lo pongo para lo que sigue, despues se borra.
+                int accountId = accountRepository.Count();
 
-            //¿Como conseguimos el id? Por ahora supongamos que lo consigo de x forma y lo asigno a una variable
-            int accountId = 1;
+                Account account = new Account(accountId, pAccountName, pAccountOverdraftLimit, client);
 
-            //Continuemos con lo que si seria el cuerpo
-            Account account = new Account(accountId, pAccountName,pAccountOverdraftLimit, client);
-            //accountRepository.add(account);    Supongamos que con eso queda añadido.
-
-
-            //De esta forma, si la lista del cliente se crea por Mapeo no hace falta actualizarlo, solo
-            // es necesario actualizar al repositorio de cuentas.
-  
+                accountRepository.Add(account);
+                //De esta forma, si la lista del cliente se crea por Mapeo no hace falta actualizarlo, solo
+                // es necesario actualizar al repositorio de cuentas.
+            }
+            //Tenemos que analizar las excepciones correspondientes a cliente no encontrado y las de error en la base de datos
+            catch (Exception)
+            {
+	            throw;
+            }
         }       
+        //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
+        //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
+        //la clase Client desde afuera, ademas seria innecesario este metodo
+        public IList<AccountDTO> ClientSummary(int pClientId){
+            //Obtenemos el cliente por ID
+            Client client = clientRepository.Get(pClientId);
+            //Obtenemos todas las cuentas del cliente
+            IList<Account> accounts = client.Accounts;
+            //Creamos la lista que vamos a devolver y le decimos la capacidad que va a tener para que no
+            //tenga que crecer dinamicamente.
+            IList<AccountDTO> accountDTOs = new List<AccountDTO>(accounts.Count);
+            foreach (Account acc in accounts)
+	        {
+                AccountDTO dTO = new AccountDTO();
+                dTO.Id = acc.Id;
+                dTO.Name = acc.Name;
+                dTO.OverdraftLimit = acc.OverdraftLimit;
+                dTO.Balance = acc.GetBalance();
+
+                accountDTOs.Add(dTO);
+	        }
+            //Devolvemos la lista de dtos
+            return accountDTOs;
+        }
     }
 }
-

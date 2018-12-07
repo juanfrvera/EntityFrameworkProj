@@ -39,6 +39,5 @@ namespace AccountManager.IO
             get { return balance; }
             set { balance = value; }
         }
-
     }
 }

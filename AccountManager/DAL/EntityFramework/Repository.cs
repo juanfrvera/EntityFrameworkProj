@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Text;
 using System.Threading.Tasks;
 using AccountManager.DAL;
+using System.Linq;
 
 namespace AccountManager.DAL.EntityFramework
 {
@@ -35,6 +36,11 @@ namespace AccountManager.DAL.EntityFramework
         public void Remove(TEntity pEntity)
         {
             iDbContext.Set<TEntity>().Remove(pEntity);
+        }
+
+        public int Count()
+        {
+            return iDbContext.Set<TEntity>().Count<TEntity>();
         }
     }
 }

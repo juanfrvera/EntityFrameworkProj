@@ -12,5 +12,6 @@ namespace AccountManager.DAL
         void Remove(TEntity pEntity);
         TEntity Get(int pId);
         IEnumerable<TEntity> GetAll();
+        int Count();
     }
 }

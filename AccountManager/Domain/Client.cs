@@ -35,6 +35,7 @@ namespace AccountManager.Domain
         //Atributos inferidos
         private Document iDocument;
         private IList<Account> iAccounts;
+        public IList<Account> Accounts { get{return iAccounts;} }
 
         //Constructor
         public Client()
