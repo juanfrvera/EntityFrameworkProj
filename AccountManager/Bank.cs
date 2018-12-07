@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AccountManager.IO;
-using AccountManager.Domain;   //Este lo agregue yo recien
-using AccountManager.DAL;//Para los repositorios
+using AccountManager.Domain;
+using AccountManager.DAL;
 namespace AccountManager
 {
     internal class Bank
@@ -15,7 +12,25 @@ namespace AccountManager
 
         public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
         {
-            throw new NotImplementedException();
+            //Obtenemos el cliente por ID
+            Client client = clientRepository.Get(pClientId);
+            //Obtenemos todas las cuentas del cliente
+            IList<Account> accounts = client.Accounts;
+            //Creamos la lista que vamos a devolver y le decimos la capacidad que va a tener para que no
+            //tenga que crecer dinamicamente.
+            IList<AccountDTO> accountDTOs = new List<AccountDTO>(accounts.Count);
+            foreach (Account acc in accounts)
+            {
+                AccountDTO dTO = new AccountDTO();
+                dTO.Id = acc.Id;
+                dTO.Name = acc.Name;
+                dTO.OverdraftLimit = acc.OverdraftLimit;
+                dTO.Balance = acc.GetBalance();
+
+                accountDTOs.Add(dTO);
+            }
+            //Devolvemos la lista de dtos
+            return accountDTOs;
         }
         public IEnumerable<AccountMovementDTO> GetAccountMovements(int pAccountId)
         {
@@ -46,25 +61,7 @@ namespace AccountManager
         //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
         //la clase Client desde afuera, ademas seria innecesario este metodo
         public IList<AccountDTO> ClientSummary(int pClientId){
-            //Obtenemos el cliente por ID
-            Client client = clientRepository.Get(pClientId);
-            //Obtenemos todas las cuentas del cliente
-            IList<Account> accounts = client.Accounts;
-            //Creamos la lista que vamos a devolver y le decimos la capacidad que va a tener para que no
-            //tenga que crecer dinamicamente.
-            IList<AccountDTO> accountDTOs = new List<AccountDTO>(accounts.Count);
-            foreach (Account acc in accounts)
-	        {
-                AccountDTO dTO = new AccountDTO();
-                dTO.Id = acc.Id;
-                dTO.Name = acc.Name;
-                dTO.OverdraftLimit = acc.OverdraftLimit;
-                dTO.Balance = acc.GetBalance();
-
-                accountDTOs.Add(dTO);
-	        }
-            //Devolvemos la lista de dtos
-            return accountDTOs;
+            throw new NotImplementedException();
         }
     }
 }
