@@ -60,8 +60,5 @@ namespace AccountManager
         //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
         //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
         //la clase Client desde afuera, ademas seria innecesario este metodo
-        public IList<AccountDTO> ClientSummary(int pClientId){
-            throw new NotImplementedException();
-        }
-    }
+      
 }

@@ -43,13 +43,13 @@ namespace AccountManager.Domain
 
         private IList<AccountMovement> iMovements;
 
-        //Constructor  {Lo modifique, miralo y despues borra esto. Le puse id, nombre, overd y client}
+  
         public Account(int pId, string pName, double pOverdraftLimit, Client pClient)
         {
             id = pId;
             name = pName;
             overdraftLimit = pOverdraftLimit;
-            client = pClient;  //Aca añadi una propiedad Cliente porque en el diagrama aparecia +Client.
+            client = pClient; 
             iMovements = new List<AccountMovement>();
         }
         //Metodos
