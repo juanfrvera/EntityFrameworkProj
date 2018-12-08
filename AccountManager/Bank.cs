@@ -34,7 +34,61 @@ namespace AccountManager
         }
         public IEnumerable<AccountMovementDTO> GetAccountMovements(int pAccountId)
         {
-            throw new NotImplementedException();
+            try 
+            {	        
+               Account account = accountRepository.Get(pAccountId);
+
+               movements = account.GetMovements();
+               
+               IList<AccountMovementDTO> accountMovementDTOs = new List<AccountMovementDTO>(movements.Count);
+               foreach (AccountMovement mov in movements)
+                {
+                  AccountMovementDTO dTO = new AccountMovementDTO();
+                  dTO.Id = mov.Id;
+                  dTO.Date = mov.Date;
+                  dTO.Description = mov.Description;
+                  dTO.Amount = mov.Amount;
+
+                  accountMovementDTOs.Add(dTO);
+                }
+                //Devolvemos la lista de dtos
+                return accountMovementDTOs;
+              }
+            //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
+            catch (Exception)
+            {
+	            throw;
+            }
+        }
+
+
+        public IEnumerable<AccountMovementDTO> GetLastAccountMovements(int pAccountId)
+        {
+            try 
+            {	        
+               Account account = accountRepository.Get(pAccountId);
+
+               movements = account.GetLastMovements();
+               
+               IList<AccountMovementDTO> accountMovementDTOs = new List<AccountMovementDTO>(movements.Count);
+               foreach (AccountMovement mov in movements)
+                {
+                  AccountMovementDTO dTO = new AccountMovementDTO();
+                  dTO.Id = mov.Id;
+                  dTO.Date = mov.Date;
+                  dTO.Description = mov.Description;
+                  dTO.Amount = mov.Amount;
+
+                  accountMovementDTOs.Add(dTO);
+                }
+                //Devolvemos la lista de dtos
+                return accountMovementDTOs;
+              }
+            //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
+            catch (Exception)
+            {
+	            throw;
+            }
         }
 
         public void CreateAccount(int pClientId,string pAccountName, double pAccountOverdraftLimit)

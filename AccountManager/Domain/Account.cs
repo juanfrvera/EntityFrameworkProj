@@ -66,5 +66,10 @@ namespace AccountManager.Domain
         {   
             return iMovements.OrderByDescending(mov => mov.Date).Take<AccountMovement>(pCount);
         }
+
+          public IEnumerable<AccountMovement> GetMovements()
+        {   
+            return iMovements.OrderByDescending(mov => mov.Date);
+        }
     }
 }
