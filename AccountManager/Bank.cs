@@ -7,10 +7,17 @@ namespace AccountManager
 {
     internal class Bank
     {
-        private IClientRepository clientRepository;
-        private IAccountRepository accountRepository;
 
-        public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
+        private IUnitOfWork unitOfWork;
+        private IClientRepository clientRepository;  //Hay que reemplazar estos dos con el unit of work que estoy pasando
+        private IAccountRepository accountRepository; //hay que poner unitofwork.xxxxxxxx en todos los metodos
+
+       
+ 
+        //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
+        //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
+        //la clase Client desde afuera, ademas seria innecesario este metodo    
+            public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
         {
             //Obtenemos el cliente por ID
             Client client = clientRepository.Get(pClientId);
@@ -111,8 +118,49 @@ namespace AccountManager
 	            throw;
             }
         }       
-        //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
-        //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
-        //la clase Client desde afuera, ademas seria innecesario este metodo
-      
+
+
+        //Registrar los movimientos realizados en las cuentas, para los cuales se debe
+        //registrar la fecha en que fue realizado el movimiento, la descripción del mismo y la
+        //cantidad de dinero acreditado o debitado de la cuenta.
+        //{Agregamos este metodo ya que pide registrar movimientos.} 
+
+        public void AddNewMovement(int pAccountId, AccountMovementDTO pAccountMovementDTO)
+        {
+            try 
+            {	//Buscamos la cuenta y creamos un movimiento nuevo con los datos del parametro.      
+               Account account = accountRepository.Get(pAccountId);
+
+               AccountMovement movement = new AccountMovement();
+           
+                  movement.Id = pAccountMovementDTO.Id;
+                  movement.Date = pAccountMovementDTO.Date;
+                  movement.Description = pAccountMovementDTO.Description;
+                  movement.Amount = pAccountMovementDTO.Amount;
+
+                //Agregamos el movimiento a la cuenta.
+                account.AddMovement(movement);
+
+                //Faltaria "guardar" la modificacion. Deberiamos preguntar y sino borrar.
+                
+                
+              }
+
+
+            //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
+            catch (Exception)
+            {
+	            throw;
+            }
+        }
+              }
+            //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
+            catch (Exception)
+            {
+	            throw;
+            }
+        }
+                
+        }               
+    }  
 }

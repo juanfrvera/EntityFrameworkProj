@@ -71,5 +71,12 @@ namespace AccountManager.Domain
         {   
             return iMovements.OrderByDescending(mov => mov.Date);
         }
+
+
+        //Para poder registrar movimientos
+         public void AddMovement(AccountMovement pAccountMovement)
+         {
+            iMovements.Add(pAccountMovement);
+         }
     }
 }
