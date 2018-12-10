@@ -14,7 +14,7 @@ namespace AccountManager.DAL.EntityFramework
         public IEnumerable<Account> GetOverdrawnAccounts()
         {
             var accounts = base.GetAll();
-            return accounts.Where((acc => acc.GetBalance() ) < (acc => acc.GetOverdraftLimit() * (-1) ));
+            return accounts.Where(acc => acc.GetBalance()  < -acc.OverdraftLimit);
         }
     }
 }

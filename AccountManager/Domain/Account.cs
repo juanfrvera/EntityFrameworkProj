@@ -37,8 +37,8 @@ namespace AccountManager.Domain
 
         public Client Client
         {
-            get { return client; }
-            set { client = value; } 
+            get { return iClient; }
+            set { iClient = value; } 
         }
 
         private IList<AccountMovement> iMovements;
@@ -49,7 +49,7 @@ namespace AccountManager.Domain
             id = pId;
             name = pName;
             overdraftLimit = pOverdraftLimit;
-            client = pClient; 
+            iClient = pClient; 
             iMovements = new List<AccountMovement>();
         }
         //Metodos
@@ -62,21 +62,31 @@ namespace AccountManager.Domain
             }
             return balance;
         }
+        /// <summary>
+        /// Devuelve los ultimos movimientos que hubo en la cuenta
+        /// </summary>
+        /// <param name="pCount"></param>
+        /// <returns></returns>
         public IEnumerable<AccountMovement> GetLastMovements(int pCount = 7)
         {   
-            return iMovements.OrderByDescending(mov => mov.Date).Take<AccountMovement>(pCount);
+            return iMovements.OrderByDescending(mov => mov.Date).Take(pCount);
         }
-
-          public IEnumerable<AccountMovement> GetMovements()
+        /// <summary>
+        /// Devuelve todos los movimientos registrados en la cuenta
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<AccountMovement> GetMovements()
         {   
             return iMovements.OrderByDescending(mov => mov.Date);
         }
 
-
-        //Para poder registrar movimientos
-         public void AddMovement(AccountMovement pAccountMovement)
-         {
+        /// <summary>
+        /// Registra el movimiento indicado en la cuenta
+        /// </summary>
+        /// <param name="pAccountMovement"></param>
+        public void AddMovement(AccountMovement pAccountMovement)
+        {
             iMovements.Add(pAccountMovement);
-         }
+        }
     }
 }

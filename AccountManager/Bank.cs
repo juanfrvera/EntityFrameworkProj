@@ -39,28 +39,38 @@ namespace AccountManager
             //Devolvemos la lista de dtos
             return accountDTOs;
         }
+        /// <summary>
+        /// Traduce una lista que contiene AccountMovement y devuelve una lista que contiene AccountMovementDTO
+        /// </summary>
+        /// <param name="movements"></param>
+        /// <returns></returns>
+        private IEnumerable<AccountMovementDTO> Translate(IEnumerable<AccountMovement> movements)
+        {
+            //Es IList para poder usar el metodo "Add()"
+            IList<AccountMovementDTO> accountMovementDTOs = new List<AccountMovementDTO>();
+
+            foreach (AccountMovement mov in movements)
+            {
+                AccountMovementDTO dTO = new AccountMovementDTO();
+                dTO.Id = mov.Id;
+                dTO.Date = mov.Date;
+                dTO.Description = mov.Description;
+                dTO.Amount = mov.Amount;
+
+                accountMovementDTOs.Add(dTO);
+            }
+            //Devolvemos la lista de dtos
+            return accountMovementDTOs;
+        }
+
         public IEnumerable<AccountMovementDTO> GetAccountMovements(int pAccountId)
         {
             try 
             {	        
                Account account = accountRepository.Get(pAccountId);
 
-               movements = account.GetMovements();
-               
-               IList<AccountMovementDTO> accountMovementDTOs = new List<AccountMovementDTO>(movements.Count);
-               foreach (AccountMovement mov in movements)
-                {
-                  AccountMovementDTO dTO = new AccountMovementDTO();
-                  dTO.Id = mov.Id;
-                  dTO.Date = mov.Date;
-                  dTO.Description = mov.Description;
-                  dTO.Amount = mov.Amount;
-
-                  accountMovementDTOs.Add(dTO);
-                }
-                //Devolvemos la lista de dtos
-                return accountMovementDTOs;
-              }
+               return Translate(account.GetMovements());
+            }
             //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
             catch (Exception)
             {
@@ -68,29 +78,14 @@ namespace AccountManager
             }
         }
 
-
-        public IEnumerable<AccountMovementDTO> GetLastAccountMovements(int pAccountId)
+        public IEnumerable<AccountMovementDTO> GetLastAccountMovements(int pAccountId, int pCount)
         {
             try 
             {	        
                Account account = accountRepository.Get(pAccountId);
 
-               movements = account.GetLastMovements();
-               
-               IList<AccountMovementDTO> accountMovementDTOs = new List<AccountMovementDTO>(movements.Count);
-               foreach (AccountMovement mov in movements)
-                {
-                  AccountMovementDTO dTO = new AccountMovementDTO();
-                  dTO.Id = mov.Id;
-                  dTO.Date = mov.Date;
-                  dTO.Description = mov.Description;
-                  dTO.Amount = mov.Amount;
-
-                  accountMovementDTOs.Add(dTO);
-                }
-                //Devolvemos la lista de dtos
-                return accountMovementDTOs;
-              }
+               return Translate(account.GetLastMovements(pCount));
+            }
             //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
             catch (Exception)
             {
@@ -124,28 +119,26 @@ namespace AccountManager
         //registrar la fecha en que fue realizado el movimiento, la descripción del mismo y la
         //cantidad de dinero acreditado o debitado de la cuenta.
         //{Agregamos este metodo ya que pide registrar movimientos.} 
-
         public void AddNewMovement(int pAccountId, AccountMovementDTO pAccountMovementDTO)
         {
             try 
-            {	//Buscamos la cuenta y creamos un movimiento nuevo con los datos del parametro.      
-               Account account = accountRepository.Get(pAccountId);
+            {	
+                //Buscamos la cuenta y creamos un movimiento nuevo con los datos del parametro.      
+                Account account = accountRepository.Get(pAccountId);
 
-               AccountMovement movement = new AccountMovement();
+                AccountMovement movement = new AccountMovement();
            
-                  movement.Id = pAccountMovementDTO.Id;
-                  movement.Date = pAccountMovementDTO.Date;
-                  movement.Description = pAccountMovementDTO.Description;
-                  movement.Amount = pAccountMovementDTO.Amount;
+                movement.Id = pAccountMovementDTO.Id;
+                movement.Date = pAccountMovementDTO.Date;
+                movement.Description = pAccountMovementDTO.Description;
+                movement.Amount = pAccountMovementDTO.Amount;
 
                 //Agregamos el movimiento a la cuenta.
                 account.AddMovement(movement);
 
                 //Faltaria "guardar" la modificacion. Deberiamos preguntar y sino borrar.
                 
-                
-              }
-
+            }
 
             //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
             catch (Exception)
@@ -153,14 +146,5 @@ namespace AccountManager
 	            throw;
             }
         }
-              }
-            //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
-            catch (Exception)
-            {
-	            throw;
-            }
-        }
-                
-        }               
-    }  
+    }
 }
