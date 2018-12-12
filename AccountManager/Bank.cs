@@ -7,20 +7,19 @@ namespace AccountManager
 {
     internal class Bank
     {
-
         private IUnitOfWork unitOfWork;
-        private IClientRepository clientRepository;  //Hay que reemplazar estos dos con el unit of work que estoy pasando
-        private IAccountRepository accountRepository; //hay que poner unitofwork.xxxxxxxx en todos los metodos
 
-       
- 
+        public Bank(){
+
+        }
+
         //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
         //Asumimos que pasan el id del cliente en vez del cliente entero ya que sino habria dependencia con
         //la clase Client desde afuera, ademas seria innecesario este metodo    
-            public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
+        public IEnumerable<AccountDTO> GetClientAccounts(int pClientId)
         {
             //Obtenemos el cliente por ID
-            Client client = clientRepository.Get(pClientId);
+            Client client = unitOfWork.ClientRepository.Get(pClientId);
             //Obtenemos todas las cuentas del cliente
             IList<Account> accounts = client.Accounts;
             //Creamos la lista que vamos a devolver y le decimos la capacidad que va a tener para que no
@@ -67,7 +66,7 @@ namespace AccountManager
         {
             try 
             {	        
-               Account account = accountRepository.Get(pAccountId);
+               Account account = unitOfWork.unitOfWork.AccountRepository.Get(pAccountId);
 
                return Translate(account.GetMovements());
             }
@@ -82,7 +81,7 @@ namespace AccountManager
         {
             try 
             {	        
-               Account account = accountRepository.Get(pAccountId);
+               Account account = unitOfWork.AccountRepository.Get(pAccountId);
 
                return Translate(account.GetLastMovements(pCount));
             }
@@ -97,13 +96,13 @@ namespace AccountManager
         { 
             try 
             {	        
-                Client client = clientRepository.Get(pClientId);
+                Client client = unitOfWork.ClientRepository.Get(pClientId);
 
-                int accountId = accountRepository.Count();
+                int accountId = unitOfWork.AccountRepository.Count();
 
                 Account account = new Account(accountId, pAccountName, pAccountOverdraftLimit, client);
 
-                accountRepository.Add(account);
+                unitOfWork.AccountRepository.Add(account);
                 //De esta forma, si la lista del cliente se crea por Mapeo no hace falta actualizarlo, solo
                 // es necesario actualizar al repositorio de cuentas.
             }
@@ -124,7 +123,7 @@ namespace AccountManager
             try 
             {	
                 //Buscamos la cuenta y creamos un movimiento nuevo con los datos del parametro.      
-                Account account = accountRepository.Get(pAccountId);
+                Account account = unitOfWork.AccountRepository.Get(pAccountId);
 
                 AccountMovement movement = new AccountMovement();
            
@@ -137,7 +136,7 @@ namespace AccountManager
                 account.AddMovement(movement);
 
                 //Faltaria "guardar" la modificacion. Deberiamos preguntar y sino borrar.
-                
+                unitOfWork.AccountRepository.SaveChanges();
             }
 
             //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos

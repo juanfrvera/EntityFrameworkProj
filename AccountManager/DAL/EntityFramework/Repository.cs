@@ -42,5 +42,9 @@ namespace AccountManager.DAL.EntityFramework
         {
             return iDbContext.Set<TEntity>().Count<TEntity>();
         }
+
+        public void SaveChanges(){
+            iDbContext.SaveChanges();
+        }
     }
 }

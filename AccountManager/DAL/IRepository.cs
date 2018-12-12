@@ -13,5 +13,6 @@ namespace AccountManager.DAL
         TEntity Get(int pId);
         IEnumerable<TEntity> GetAll();
         int Count();
+        void SaveChanges();
     }
 }

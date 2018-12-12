@@ -16,7 +16,6 @@ namespace AccountManager.DAL.EntityFramework
         {
             get
             {
-
                 if (this.AccountRepository == null)
                 {
                     this.AccountRepository = new AccountRepository(context);
@@ -29,7 +28,6 @@ namespace AccountManager.DAL.EntityFramework
         {
             get
             {
-
                 if (this.ClientRepository == null)
                 {
                     this.ClientRepository = new ClientRepository(context);
@@ -37,9 +35,6 @@ namespace AccountManager.DAL.EntityFramework
                 return ClientRepository;
             }
         }
-
-
-
 
         public void Complete()
         {
