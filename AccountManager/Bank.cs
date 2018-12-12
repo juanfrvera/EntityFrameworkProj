@@ -145,5 +145,36 @@ namespace AccountManager
 	            throw;
             }
         }
+
+        public Transference(int pSenderAccountId, int pRecieverAccountId, DateTime pDate, string pDescription, float pAmount)
+        {
+            try
+            {   //Obtenemos las cuentas
+                Account sender = unitOfWork.AccountRepository.Get(pSenderAccountId);
+                Account reciever = unitOfWork.AccountRepository.Get(pRecieverAccountId);
+
+                //Creamos el movimiento de envio, con el monto negativo pues se debita.
+                AccountMovementDTO senderMovement = new accountMovementDTO(pSenderAccountId, pDate, pDescription, -pAmmount);
+                
+                //Agregamos el movimiento, hay que controlar con alguna excepcion que no puede superarse el acuerdo.
+                sender.AddMovement(senderMovement);
+
+
+                //Hacemos lo mismo para el receptor:
+                AccountMovementDTO recieverMovement = new accountMovementDTO(pRecieverAccountId, pDate, pDescription, pAmmount);
+                
+                //Agregamos el movimiento, aqui no es necesario controlar la excepcion de acuerdo.
+                sender.AddMovement(recieverMovement);
+
+
+                //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
+
+                unitOfWork.Complete();
+            }
+            catch (Exception)
+            {
+	            throw;
+            }
+        }
     }
 }
