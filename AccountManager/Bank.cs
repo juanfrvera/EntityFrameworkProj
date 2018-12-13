@@ -66,7 +66,7 @@ namespace AccountManager
         {
             try 
             {	        
-               Account account = unitOfWork.unitOfWork.AccountRepository.Get(pAccountId);
+               Account account = unitOfWork.AccountRepository.Get(pAccountId);
 
                return Translate(account.GetMovements());
             }
@@ -118,19 +118,14 @@ namespace AccountManager
         //registrar la fecha en que fue realizado el movimiento, la descripción del mismo y la
         //cantidad de dinero acreditado o debitado de la cuenta.
         //{Agregamos este metodo ya que pide registrar movimientos.} 
-        public void AddNewMovement(int pAccountId, AccountMovementDTO pAccountMovementDTO)
+        public void AddNewMovement(int pAccountId, AccountMovementDTO pMovDTO)
         {
             try 
             {	
                 //Buscamos la cuenta y creamos un movimiento nuevo con los datos del parametro.      
                 Account account = unitOfWork.AccountRepository.Get(pAccountId);
 
-                AccountMovement movement = new AccountMovement();
-           
-                movement.Id = pAccountMovementDTO.Id;
-                movement.Date = pAccountMovementDTO.Date;
-                movement.Description = pAccountMovementDTO.Description;
-                movement.Amount = pAccountMovementDTO.Amount;
+                AccountMovement movement = new AccountMovement(pMovDTO.Id, pMovDTO.Date, pMovDTO.Description, pMovDTO.Amount);
 
                 //Agregamos el movimiento a la cuenta.
                 account.AddMovement(movement);
@@ -146,31 +141,62 @@ namespace AccountManager
             }
         }
 
-        public Transference(int pSenderAccountId, int pRecieverAccountId, DateTime pDate, string pDescription, float pAmount)
+        public void Accredit(int pAccountId, double pAmount)
+        {
+            try
+            {
+                Account account = unitOfWork.AccountRepository.Get(pAccountId);
+                account.AddMovement(new AccountMovement(pAccountId, DateTime.Now, "Accredit", pAmount));
+            }
+            //Excepcion de cuenta no encontrada
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public void Debit(int pAccountId, double pAmount)
+        {
+            try
+            {
+                Account account = unitOfWork.AccountRepository.Get(pAccountId);
+                account.AddMovement(new AccountMovement(pAccountId, DateTime.Now, "Debit", -pAmount));
+            }
+            //Excepciones de cuenta no encontrada y de saldo insuficiente
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void Transference(int pSenderAccountId, int pRecieverAccountId, DateTime pDate, string pDescription, float pAmount)
         {
             try
             {   //Obtenemos las cuentas
                 Account sender = unitOfWork.AccountRepository.Get(pSenderAccountId);
-                Account reciever = unitOfWork.AccountRepository.Get(pRecieverAccountId);
+                Account receiver = unitOfWork.AccountRepository.Get(pRecieverAccountId);
 
                 //Creamos el movimiento de envio, con el monto negativo pues se debita.
-                AccountMovementDTO senderMovement = new accountMovementDTO(pSenderAccountId, pDate, pDescription, -pAmmount);
+                //Debit(pSenderAccountId, pAmount);
+                AccountMovement senderMovement = new AccountMovement(pSenderAccountId, pDate, pDescription, -pAmount);
                 
                 //Agregamos el movimiento, hay que controlar con alguna excepcion que no puede superarse el acuerdo.
                 sender.AddMovement(senderMovement);
 
 
                 //Hacemos lo mismo para el receptor:
-                AccountMovementDTO recieverMovement = new accountMovementDTO(pRecieverAccountId, pDate, pDescription, pAmmount);
+                AccountMovement receiverMovement = new AccountMovement(pRecieverAccountId, pDate, pDescription, pAmount);
                 
                 //Agregamos el movimiento, aqui no es necesario controlar la excepcion de acuerdo.
-                sender.AddMovement(recieverMovement);
+                receiver.AddMovement(receiverMovement);
 
 
                 //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
 
                 unitOfWork.Complete();
             }
+            //Excepciones de sender o receiver no encontrados
+            //Excepcion de saldo insuficiente en sender
             catch (Exception)
             {
 	            throw;

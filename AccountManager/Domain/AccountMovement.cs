@@ -39,5 +39,14 @@ namespace AccountManager.Domain
             get { return amount; }
             set { amount = value; }
         }
+
+        //Constructor
+        public AccountMovement(int pId, DateTime pDate, string pDescription, double pAmmount)
+        {
+            this.Id = pId;
+            this.Date = pDate;
+            this.Description = pDescription;
+            this.Amount = pAmmount;
+        }
     }
 }
