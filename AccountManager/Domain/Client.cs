@@ -42,5 +42,14 @@ namespace AccountManager.Domain
         {
             iAccounts = new List<Account>();
         }
+
+        /// <summary>
+        /// Añade una cuenta a la lista de cuentas del cliente.
+        /// </summary>
+        /// <param name="pAccountMovement"></param>
+        public void AddAccount(Account pAccount)
+        {
+            iAccounts.Add(pAccount);
+        }
     }
 }

@@ -102,9 +102,12 @@ namespace AccountManager
 
                 Account account = new Account(accountId, pAccountName, pAccountOverdraftLimit, client);
 
+                //Añadimos la cuenta al cliente
+                client.AddAccount(account);
+                //Añadimos la cuenta y guardamos los cambios.
                 unitOfWork.AccountRepository.Add(account);
-                //De esta forma, si la lista del cliente se crea por Mapeo no hace falta actualizarlo, solo
-                // es necesario actualizar al repositorio de cuentas.
+                unitOfWork.Complete();
+              
             }
             //Tenemos que analizar las excepciones correspondientes a cliente no encontrado y las de error en la base de datos
             catch (Exception)
@@ -131,7 +134,7 @@ namespace AccountManager
                 account.AddMovement(movement);
 
                 //Faltaria "guardar" la modificacion. Deberiamos preguntar y sino borrar.
-                unitOfWork.AccountRepository.SaveChanges();
+                unitOfWork.Complete();
             }
 
             //Tenemos que analizar las excepciones correspondientes a cuenta no encontrada y las de error en la base de datos
@@ -169,30 +172,17 @@ namespace AccountManager
             }
         }
 
-        public void Transference(int pSenderAccountId, int pRecieverAccountId, DateTime pDate, string pDescription, float pAmount)
+        public void Transference(int pSenderAccountId, int pRecieverAccountId, double pAmount)
         {
             try
-            {   //Obtenemos las cuentas
-                Account sender = unitOfWork.AccountRepository.Get(pSenderAccountId);
-                Account receiver = unitOfWork.AccountRepository.Get(pRecieverAccountId);
+            {   //Debitamos de la cuenta origen
+                this.Debit(pSenderAccountId, pAmount);
 
-                //Creamos el movimiento de envio, con el monto negativo pues se debita.
-                //Debit(pSenderAccountId, pAmount);
-                AccountMovement senderMovement = new AccountMovement(pSenderAccountId, pDate, pDescription, -pAmount);
-                
-                //Agregamos el movimiento, hay que controlar con alguna excepcion que no puede superarse el acuerdo.
-                sender.AddMovement(senderMovement);
-
-
-                //Hacemos lo mismo para el receptor:
-                AccountMovement receiverMovement = new AccountMovement(pRecieverAccountId, pDate, pDescription, pAmount);
-                
-                //Agregamos el movimiento, aqui no es necesario controlar la excepcion de acuerdo.
-                receiver.AddMovement(receiverMovement);
+                //Acreditamos en la cuenta destino
+                this.Accredit(pRecieverAccountId, pAmmount);
 
 
                 //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
-
                 unitOfWork.Complete();
             }
             //Excepciones de sender o receiver no encontrados
