@@ -98,7 +98,7 @@ namespace AccountManager
             {	        
                 Client client = unitOfWork.ClientRepository.Get(pClientId);
 
-                int accountId = unitOfWork.AccountRepository.Count();
+                int accountId = unitOfWork.AccountRepository.Count()  + 1;
 
                 Account account = new Account(accountId, pAccountName, pAccountOverdraftLimit, client);
 
@@ -107,7 +107,6 @@ namespace AccountManager
                 //Añadimos la cuenta y guardamos los cambios.
                 unitOfWork.AccountRepository.Add(account);
                 unitOfWork.Complete();
-              
             }
             //Tenemos que analizar las excepciones correspondientes a cliente no encontrado y las de error en la base de datos
             catch (Exception)
@@ -179,7 +178,7 @@ namespace AccountManager
                 this.Debit(pSenderAccountId, pAmount);
 
                 //Acreditamos en la cuenta destino
-                this.Accredit(pRecieverAccountId, pAmmount);
+                this.Accredit(pRecieverAccountId, pAmount);
 
 
                 //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
@@ -187,9 +186,14 @@ namespace AccountManager
             }
             //Excepciones de sender o receiver no encontrados
             //Excepcion de saldo insuficiente en sender
-            catch (Exception)
+            catch (Account.InsufficientBalanceException)
             {
+                unitOfWork.Dispose();
 	            throw;
+            }
+            catch (NullReferenceException)
+            {
+
             }
         }
     }

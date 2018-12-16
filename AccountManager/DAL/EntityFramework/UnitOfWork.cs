@@ -8,48 +8,55 @@ namespace AccountManager.DAL.EntityFramework
 {
     internal class UnitOfWork : IUnitOfWork
     {
-        AccountManagerDbContext iDbContext;
+        IAccountRepository iAccountRepository;
+        IClientRepository iClientRepository;
 
+        AccountManagerDbContext iDbContext;
 
 
         public IAccountRepository AccountRepository
         {
             get
             {
-                if (this.AccountRepository == null)
+                if (this.iAccountRepository == null)
                 {
-                    this.AccountRepository = new AccountRepository(context);
+                    this.iAccountRepository = new AccountRepository(iDbContext);
                 }
-                return AccountRepository;
+                return iAccountRepository;
             }
         }
-
         public IClientRepository ClientRepository 
         {
             get
             {
-                if (this.ClientRepository == null)
+                if (this.iClientRepository == null)
                 {
-                    this.ClientRepository = new ClientRepository(context);
+                    this.iClientRepository = new ClientRepository(iDbContext);
                 }
-                return ClientRepository;
+                return iClientRepository;
             }
         }
 
+        private UnitOfWork()
+        {
+            iDbContext = new AccountManagerDbContext();
+        }
+
+
         public void Complete()
         {
-           context.SaveChanges(); 
+            iDbContext.SaveChanges(); 
         }
 
         private bool disposed = false;
 
-        private virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!this.disposed)
             {
                 if (disposing)
                 {
-                    context.Dispose();
+                    iDbContext.Dispose();
                 }
             }
             this.disposed = true;

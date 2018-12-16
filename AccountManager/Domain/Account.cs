@@ -80,6 +80,10 @@ namespace AccountManager.Domain
             return iMovements.OrderByDescending(mov => mov.Date);
         }
 
+        public class InsufficientBalanceException : Exception
+        {
+            public InsufficientBalanceException() : base("Insufficient balance"){}
+        }
         /// <summary>
         /// Registra el movimiento indicado en la cuenta
         /// </summary>
@@ -92,7 +96,7 @@ namespace AccountManager.Domain
                 iMovements.Add(pAccountMovement);
             }
             else
-            {throw new Exception("Insufficient balance");}
+            { throw new InsufficientBalanceException(); }
         }
     }
 }
