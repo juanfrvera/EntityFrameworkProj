@@ -98,5 +98,33 @@ namespace AccountManager.Domain
             else
             { throw new InsufficientBalanceException(); }
         }
+
+
+        //Metodos para las transferencias.
+        public void Accredit(AccountMovement pAccountMovement)
+        {
+            try
+            {
+                this.AddMovement(pAccountMovement);
+            }
+            //Excepcion de cuenta no encontrada
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public void Debit(AccountMovement pAccountMovement)
+        {
+            try
+            {
+                this.AddMovement(pAccountMovement);
+            }
+            //Excepciones de cuenta no encontrada y de saldo insuficiente
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

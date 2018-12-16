@@ -148,7 +148,10 @@ namespace AccountManager
             try
             {
                 Account account = unitOfWork.AccountRepository.Get(pAccountId);
-                account.AddMovement(new AccountMovement(pAccountId, DateTime.Now, "Accredit", pAmount));
+                account.Acredit(new AccountMovement(pAccountId, DateTime.Now, "Accredit", pAmount));
+
+                //Guardamos
+                unitOfWork.Complete();
             }
             //Excepcion de cuenta no encontrada
             catch (Exception)
@@ -162,12 +165,20 @@ namespace AccountManager
             try
             {
                 Account account = unitOfWork.AccountRepository.Get(pAccountId);
-                account.AddMovement(new AccountMovement(pAccountId, DateTime.Now, "Debit", -pAmount));
+                account.Debit(new AccountMovement(pAccountId, DateTime.Now, "Debit", -pAmount));
+                
+                //Guardamos
+                unitOfWork.Complete();
             }
             //Excepciones de cuenta no encontrada y de saldo insuficiente
-            catch (Exception)
+            catch (Account.InsufficientBalanceException)
             {
-                throw;
+                unitOfWork.Dispose();
+	            throw;
+            }
+            catch (NullReferenceException)
+            {
+
             }
         }
 
@@ -175,10 +186,12 @@ namespace AccountManager
         {
             try
             {   //Debitamos de la cuenta origen
-                this.Debit(pSenderAccountId, pAmount);
+                Account senderAccount = unitOfWork.AccountRepository.Get(pSenderAccountId);
+                senderAccount.Debit(new AccountMovement(pSenderAccountId, DateTime.Now, "Transference to " + pRecieverAccountId, -pAmount));
 
                 //Acreditamos en la cuenta destino
-                this.Accredit(pRecieverAccountId, pAmount);
+                Account recieverAccount = unitOfWork.AccountRepository.Get(pRecieverAccountId);
+                recieverAccount.Acredit(new AccountMovement(pSRecieverAccountId, DateTime.Now, "Transference to " + pSenderAccountId, pAmount));
 
 
                 //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
