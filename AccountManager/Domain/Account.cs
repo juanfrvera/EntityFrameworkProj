@@ -86,7 +86,13 @@ namespace AccountManager.Domain
         /// <param name="pAccountMovement"></param>
         public void AddMovement(AccountMovement pAccountMovement)
         {
-            iMovements.Add(pAccountMovement);
+            double balance = this.GetBalance();
+            if (balance + pAccountMovement.Amount >= - this.overdraftLimit)
+            {
+                iMovements.Add(pAccountMovement);
+            }
+            else
+            {throw new Exception("Insufficient balance");}
         }
     }
 }
