@@ -8,12 +8,13 @@ namespace AccountManager.Domain
 {
     internal class Client
     {
+        //Atributos y propiedades
         private int id;
 
         public int Id
         {
             get { return id; }
-            set { id = value; }
+            private set { id = value; }
         }
 
         private String firstName;
@@ -21,7 +22,7 @@ namespace AccountManager.Domain
         public String FirstName
         {
             get { return firstName; }
-            set { firstName = value; }
+            private set { firstName = value; }
         }
 
         private String lastName;
@@ -29,11 +30,12 @@ namespace AccountManager.Domain
         public String LastName
         {
             get { return lastName; }
-            set { lastName = value; }
+            private set { lastName = value; }
         }
 
-        //Atributos inferidos
+        //Atributos y propiedades inferidos
         private Document iDocument;
+        public Document Document { get { return iDocument; } }
         private IList<Account> iAccounts;
         public IList<Account> Accounts { get{return iAccounts;} }
 
@@ -41,6 +43,13 @@ namespace AccountManager.Domain
         public Client()
         {
             iAccounts = new List<Account>();
+        }
+        public Client(int pId, string pFirstName, string pLastName, string pDocumentType, string pDocumentNumber)
+        {
+            this.Id = pId;
+            this.FirstName = pFirstName;
+            this.LastName = pLastName;
+            this.iDocument = new Document(pDocumentType,pDocumentNumber);
         }
 
         /// <summary>

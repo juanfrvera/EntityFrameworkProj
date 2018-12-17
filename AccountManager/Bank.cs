@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using AccountManager.IO;
 using AccountManager.Domain;
 using AccountManager.DAL;
+using AccountManager.DAL.EntityFramework;
+
 namespace AccountManager
 {
     internal class Bank
@@ -10,7 +12,7 @@ namespace AccountManager
         private IUnitOfWork unitOfWork;
 
         public Bank(){
-
+            unitOfWork = new UnitOfWork();
         }
 
         //Dado un cliente, se debe permitir obtener información sumaria de sus cuentas. 
@@ -92,6 +94,24 @@ namespace AccountManager
             }
         }
 
+
+        public void CreateClient(ClientDTO dTO)
+        {
+            try
+            {
+                int newId = unitOfWork.ClientRepository.Count() + 1;
+                Client newClient = new Client(newId, dTO.firstName, dTO.lastName, dTO.documentType, dTO.documentNumber);
+                unitOfWork.ClientRepository.Add(newClient);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        public class ClientDoesntExistsException : Exception
+        {
+            public ClientDoesntExistsException() : base("The given client id is not valid.") { }
+        }
         public void CreateAccount(int pClientId,string pAccountName, double pAccountOverdraftLimit)
         { 
             try 
@@ -109,9 +129,10 @@ namespace AccountManager
                 unitOfWork.Complete();
             }
             //Tenemos que analizar las excepciones correspondientes a cliente no encontrado y las de error en la base de datos
-            catch (Exception)
+            //Se quizo acceder a un valor nulo ya que el cliente no fue encontrado y el Get devolvio null
+            catch (NullReferenceException)
             {
-	            throw;
+                throw new ClientDoesntExistsException();
             }
         }       
 
@@ -148,7 +169,7 @@ namespace AccountManager
             try
             {
                 Account account = unitOfWork.AccountRepository.Get(pAccountId);
-                account.Acredit(new AccountMovement(pAccountId, DateTime.Now, "Accredit", pAmount));
+                account.Accredit(new AccountMovement(pAccountId, DateTime.Now, "Accredit", pAmount));
 
                 //Guardamos
                 unitOfWork.Complete();
@@ -156,7 +177,6 @@ namespace AccountManager
             //Excepcion de cuenta no encontrada
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -178,21 +198,21 @@ namespace AccountManager
             }
             catch (NullReferenceException)
             {
-
+                throw;
             }
         }
 
-        public void Transference(int pSenderAccountId, int pRecieverAccountId, double pAmount)
+        public void Transference(int pSenderAccountId, int pReceiverAccountId, double pAmount)
         {
             try
-            {   //Debitamos de la cuenta origen
+            {   
+                //Debitamos de la cuenta origen
                 Account senderAccount = unitOfWork.AccountRepository.Get(pSenderAccountId);
-                senderAccount.Debit(new AccountMovement(pSenderAccountId, DateTime.Now, "Transference to " + pRecieverAccountId, -pAmount));
+                senderAccount.Debit(new AccountMovement(pSenderAccountId, DateTime.Now, "Transference to " + pReceiverAccountId, -pAmount));
 
                 //Acreditamos en la cuenta destino
-                Account recieverAccount = unitOfWork.AccountRepository.Get(pRecieverAccountId);
-                recieverAccount.Acredit(new AccountMovement(pSRecieverAccountId, DateTime.Now, "Transference to " + pSenderAccountId, pAmount));
-
+                Account recieverAccount = unitOfWork.AccountRepository.Get(pReceiverAccountId);
+                recieverAccount.Accredit(new AccountMovement(pReceiverAccountId, DateTime.Now, "Transference to " + pSenderAccountId, pAmount));
 
                 //Al terminar todo hacemos un "Complete" en el unit of work para que se guarde todo o nada.
                 unitOfWork.Complete();

@@ -65,6 +65,7 @@
     <Compile Include="Domain\Document.cs" />
     <Compile Include="IO\AccountDTO.cs" />
     <Compile Include="IO\AccountMovementDTO.cs" />
+    <Compile Include="IO\ClientDTO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

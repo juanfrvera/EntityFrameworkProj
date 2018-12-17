@@ -8,12 +8,14 @@ namespace AccountManager.DAL.EntityFramework
 {
     internal class UnitOfWork : IUnitOfWork
     {
-        IAccountRepository iAccountRepository;
-        IClientRepository iClientRepository;
+        //Atributos
+        private IAccountRepository iAccountRepository;
+        private IClientRepository iClientRepository;
 
-        AccountManagerDbContext iDbContext;
+        private AccountManagerDbContext iDbContext;
+        private bool iDisposed = false;
 
-
+        //Propiedades
         public IAccountRepository AccountRepository
         {
             get
@@ -37,29 +39,31 @@ namespace AccountManager.DAL.EntityFramework
             }
         }
 
-        private UnitOfWork()
+        //Constructor
+
+        public UnitOfWork()
         {
             iDbContext = new AccountManagerDbContext();
         }
 
+        //Metodos
 
         public void Complete()
         {
             iDbContext.SaveChanges(); 
         }
 
-        private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!this.iDisposed)
             {
                 if (disposing)
                 {
                     iDbContext.Dispose();
                 }
             }
-            this.disposed = true;
+            this.iDisposed = true;
         }
 
         public void Dispose()
